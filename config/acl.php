@@ -26,7 +26,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * 
  */
 
-$config['acl_mode'] = 2; // bisa diset di config dan di controller lewat variabel $acl_mode
+$config['acl_mode'] = 2;
 $config['acl_session_user'] = 'user'; //nama sesi yang menyimpan username aktif setelah berhasil login
 $config['acl_session_level'] = 'level'; //nama sesi yang menyimpan level aktif setelah berhasil login, hanya untuk mode 2 atau 4 saja
 $config['acl_redirect'] = 'login'; // jika tidak valid maka redirect ke ...
