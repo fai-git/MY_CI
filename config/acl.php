@@ -22,7 +22,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Mode 3 dan 4 membutuhkan tabel acl, field yang direkomendasikan
  * username     : varchar() 
  * level        : varchar()
- * uri          : varchar() 
+ * uri          : text
+ * modules      : text
  * 
  */
 
