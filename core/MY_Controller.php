@@ -46,12 +46,6 @@ class MY_Controller extends CI_Controller
                     if (!in_array($acl, $this->acl_level)) {
                         redirect($acl_denied_url);
                     }
-                } else if ($this->acl_level == null && $this->session->userdata($acl_session_level) != '') {
-                    $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
-                    $acl = $r[$acl_field_level];
-                    if ($this->session->userdata($acl_session_level) != $acl) {
-                        redirect($acl_denied_url);
-                    }
                 }
                 break;
             case 3:
@@ -85,12 +79,6 @@ class MY_Controller extends CI_Controller
                     $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
                     $acl = $r[$acl_field_level];
                     if (!in_array($acl, $this->acl_level)) {
-                        redirect($acl_denied_url);
-                    }
-                } else if ($this->acl_level == null && $this->session->userdata($acl_session_level) != '') {
-                    $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
-                    $acl = $r[$acl_field_level];
-                    if ($this->session->userdata($acl_session_level) != $acl) {
                         redirect($acl_denied_url);
                     }
                 }
