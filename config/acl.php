@@ -41,5 +41,3 @@ $config['acl_uri_field_name'] = 'uri'; // nama field pada acl yang berisi uri ya
 
 // hanya digunakan jika proteksi uri atau level diaktifkan
 $config['acl_denied_url'] = 'denied'; //nama url atau controller yang ditampilkan jika uri tidak terdaftar pada tabel
-
-
