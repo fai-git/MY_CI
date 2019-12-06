@@ -6,19 +6,20 @@ class MY_Controller extends CI_Controller
     protected $template = 'template';
     protected $acl_level = [];
     protected $acl_module = '';
+    protected $acl_mode = '';
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
     }
 
-    function acl($config_name = 'acl')
+    public function acl($config_name = 'acl')
     {
         // load config, defaultnya: application/config/acl.php
         $config = $this->load->config($config_name, true);
 
         // setting variabel
-        $acl_mode = $config['acl_mode'];
+        $acl_mode_conf = ($this->acl_mode == '') ? $config['acl_mode'] : $this->acl_mode;
         $acl_session_user = $config['acl_session_user'];
         $acl_session_level = $config['acl_session_level'];
         $acl_redirect = $config['acl_redirect'];
@@ -28,8 +29,9 @@ class MY_Controller extends CI_Controller
         $acl_field_uri = $config['acl_uri_field_name'];
         $acl_field_modules = $config['acl_field_modules_name'];
         $acl_denied_url = $config['acl_denied_url'];
+        
 
-        switch ($acl_mode) {
+        switch ($acl_mode_conf) {
             case 1:
                 // cek session user
                 if ($this->session->userdata($acl_session_user) == '') {
@@ -37,13 +39,24 @@ class MY_Controller extends CI_Controller
                 }
                 break;
             case 2:
-                // cek session level
+                // cek session user
+                if ($this->session->userdata($acl_session_user) == '') {
+                    redirect($acl_redirect);
+                }
+
+                // cek level
                 if ($this->acl_level != null && $this->session->userdata($acl_session_level) != '' && !in_array($this->session->userdata($acl_session_level), $this->acl_level)) {
                     redirect($acl_denied_url);
                 } else if($this->acl_level != null && $this->session->userdata($acl_session_level) == ''){
                     $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
                     $acl = $r[$acl_field_level];
                     if (!in_array($acl, $this->acl_level)) {
+                        redirect($acl_denied_url);
+                    }
+                } else if ($this->acl_level == null && $this->session->userdata($acl_session_level) != '') {
+                    $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
+                    $acl = $r[$acl_field_level];
+                    if ($this->session->userdata($acl_session_level) != $acl) {
                         redirect($acl_denied_url);
                     }
                 }
@@ -53,18 +66,17 @@ class MY_Controller extends CI_Controller
                 if ($this->session->userdata($acl_session_user) == '') {
                     redirect($acl_redirect);
                 }
+
                 // cek uri
-                $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_field_user)])->get($acl_table)->row_array();
-                if ($r[$acl_field_uri] != 'all') {
-                    $access = 0;
-                    $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_uri]);
-                    if (in_array($this->uri->uri_string(), $acl)) {
-                        $access++;
-                    }
-                    if ($access == 0) {
-                        redirect($acl_denied_url);
-                        exit();
-                    }
+                $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
+                $access = 0;
+                $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_uri]);
+                if (in_array($this->uri->uri_string(), $acl)) {
+                    $access++;
+                }
+                if ($access > 0) {
+                    redirect($acl_denied_url);
+                    exit();
                 }
                 break;
             case 4:
@@ -72,7 +84,8 @@ class MY_Controller extends CI_Controller
                 if ($this->session->userdata($acl_session_user) == '') {
                     redirect($acl_redirect);
                 }
-                // cek session level
+
+                // cek level
                 if ($this->acl_level != null && $this->session->userdata($acl_session_level) != '' && !in_array($this->session->userdata($acl_session_level), $this->acl_level)) {
                     redirect($acl_denied_url);
                 } else if($this->acl_level != null && $this->session->userdata($acl_session_level) == ''){
@@ -81,19 +94,24 @@ class MY_Controller extends CI_Controller
                     if (!in_array($acl, $this->acl_level)) {
                         redirect($acl_denied_url);
                     }
-                }
-                // cek uri
-                $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_field_user)])->get($acl_table)->row_array();
-                if ($r[$acl_field_uri] != 'all') {
-                    $access = 0;
-                    $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_uri]);
-                    if (in_array($this->uri->uri_string(), $acl)) {
-                        $access++;
-                    }
-                    if ($access == 0) {
+                } else if ($this->acl_level == null && $this->session->userdata($acl_session_level) != '') {
+                    $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
+                    $acl = $r[$acl_field_level];
+                    if ($this->session->userdata($acl_session_level) != $acl) {
                         redirect($acl_denied_url);
-                        exit();
                     }
+                }
+
+                // cek uri
+                $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
+                $access = 0;
+                $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_uri]);
+                if (in_array($this->uri->uri_string(), $acl)) {
+                    $access++;
+                }
+                if ($access > 0) {
+                    redirect($acl_denied_url);
+                    exit();
                 }
                 break;
             case 5:
@@ -101,6 +119,7 @@ class MY_Controller extends CI_Controller
                 if ($this->session->userdata($acl_session_user) == '') {
                     redirect($acl_redirect);
                 }
+                
                 // cek modules
                 $acl_denied_url = $config['acl_denied_url'];
                 $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
@@ -116,6 +135,7 @@ class MY_Controller extends CI_Controller
                 if ($this->session->userdata($acl_session_user) == '') {
                     redirect($acl_redirect);
                 }
+
                 // cek modules
                 $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
                 if ($r[$acl_field_modules] != 'all') {
@@ -124,18 +144,17 @@ class MY_Controller extends CI_Controller
                         redirect($acl_denied_url);
                     }
                 }
+
                 // cek uri
-                $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_field_user)])->get($acl_table)->row_array();
-                if ($r[$acl_field_uri] != 'all') {
-                    $access = 0;
-                    $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_uri]);
-                    if (in_array($this->uri->uri_string(), $acl)) {
-                        $access++;
-                    }
-                    if ($access == 0) {
-                        redirect($acl_denied_url);
-                        exit();
-                    }
+                $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
+                $access = 0;
+                $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_uri]);
+                if (in_array($this->uri->uri_string(), $acl)) {
+                    $access++;
+                }
+                if ($access > 0) {
+                    redirect($acl_denied_url);
+                    exit();
                 }
                 break;
             default:
@@ -144,7 +163,7 @@ class MY_Controller extends CI_Controller
         }
     }
 
-    function render($view_name = null, $data = null)
+    public function render($view_name = null, $data = null)
     {
         if ($this->template != null || $this->template != '') {
             $view = $view_name != null ? $this->load->view($view_name, $data, true) : '';
