@@ -40,6 +40,6 @@ $config['acl_level_field_name'] = 'level'; // nama field pada acl yang berisi le
 $config['acl_field_modules_name'] = 'modules'; // nama field pada acl yang berisi module yang boleh diakses. Untuk hak akses seluruh halaman bisa diisi dengan all
 $config['acl_uri_field_name'] = 'uri'; // nama field pada acl yang berisi uri yang tidak boleh diakses.
 
-// hanya digunakan jika proteksi uri atau level diaktifkan
+// digunakan untuk mode 2 dan seterusnya
 $config['acl_denied_url'] = 'denied';
 
