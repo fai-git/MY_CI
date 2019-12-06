@@ -5,28 +5,30 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Deskripsi:
  * File acl.php adalah file konfigurasi milik MY_Controller
  * Untuk mengaktifkan acl, pada tiap controller yang menextends MY_Controller 
- * ditambahkan $this->acl() pada function __construct()
+ * ditambahkan $this->acl() pada function __construct() atau bisa juga di letakkan pada di dalam 
+ * function tertentu sesuai kebutuhan
  * Cara kerjanya sederhana:
- * 1. Akan melakukan pengecekan apakah session, level dan uri yang berisi data sesuai dengan yang didefinisikan
+ * 1. Akan melakukan pengecekan apakah session, level, module dan uri yang berisi data sesuai dengan yang didefinisikan
  * 2. Jika tidak valid maka halaman akan dipindah menuju ke halaman telah ditentukan pada file konfigurasi ini
  * 
  * ACL Mode:
- * 1 = Hanya ngecek session saja, jika session kosong maka redirect ke acl_redirect
- * 2 = Ngecek session dan level di table yang ditentukan, level bisa di definisikan di controller lewat variabel $acl_level = [] (array)
+ * 1 = Hanya ngecek session saja
+ * 2 = Ngecek session dan level
  * 3 = Ngecek session name dan uri
  * 4 = Ngecek session name, level dan uri
- * 5 = Ngecek session name dan module, module bisa didefinisikan di controller melalui variable $acl_module = '' (string)
+ * 5 = Ngecek session name dan module
  * 6 = Ngecek session name, module dan uri
  * 
- * Mode 2 levelnya bisa di override di controller atau di database
- * Mode 3 dan 4 membutuhkan tabel acl, field yang direkomendasikan
- * username     : varchar() 
- * level        : varchar()
- * uri          : varchar() 
+ * Level dan Module didefinisikan pada controller lewat variabel $this->acl_level dan $this->acl_module
+ * Mode 3 dan seterusnya membutuhkan tabel acl, field yang direkomendasikan
+ * username      : varchar() 
+ * level         : varchar()
+ * modules       : text
+ * uri_blacklist : text 
  * 
  */
 
-$config['acl_mode'] = 3; // bisa diset di config dan di controller lewat variabel $acl_mode
+$config['acl_mode'] = 1; // bisa diset di config dan di controller lewat variabel $acl_mode
 $config['acl_session_user'] = 'user'; //nama sesi yang menyimpan username aktif setelah berhasil login
 $config['acl_session_level'] = 'level'; //nama sesi yang menyimpan level aktif setelah berhasil login, hanya untuk mode 2 atau 4 saja
 $config['acl_redirect'] = 'login'; // jika tidak valid maka redirect ke ...
@@ -40,3 +42,4 @@ $config['acl_uri_field_name'] = 'uri'; // nama field pada acl yang berisi uri ya
 
 // hanya digunakan jika proteksi uri atau level diaktifkan
 $config['acl_denied_url'] = 'denied';
+
