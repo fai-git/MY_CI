@@ -5,7 +5,6 @@ class MY_Controller extends CI_Controller
 
     protected $template = 'template';
     protected $acl_level = [];
-    protected $acl_module = '';
     protected $acl_mode = '';
 
     public function __construct()
@@ -121,14 +120,14 @@ class MY_Controller extends CI_Controller
                 }
                 
                 // cek modules
-                $acl_denied_url = $config['acl_denied_url'];
                 $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
                 if ($r[$acl_field_modules] != 'all') {
                     $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_modules]);
-                    if (!in_array($this->acl_module, $acl)) {
+                    if (!in_array($this->uri->segment(1), $acl)) {
                         redirect($acl_denied_url);
                     }
                 }
+                
                 break;
             case 6:
                 // cek session user
@@ -140,7 +139,7 @@ class MY_Controller extends CI_Controller
                 $r = $this->db->where([$acl_field_user => $this->session->userdata($acl_session_user)])->get($acl_table)->row_array();
                 if ($r[$acl_field_modules] != 'all') {
                     $acl = preg_split('/\r\n|[\r\n]/', $r[$acl_field_modules]);
-                    if (!in_array($this->acl_module, $acl)) {
+                    if (!in_array($this->uri->segment(1), $acl)) {
                         redirect($acl_denied_url);
                     }
                 }
