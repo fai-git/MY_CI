@@ -28,7 +28,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * 
  */
 
-$config['acl_mode'] = 1; // bisa diset di config dan di controller lewat variabel $acl_mode
+$config['acl_mode'] = 6; // bisa diset di config dan di controller lewat variabel $acl_mode
 $config['acl_session_user'] = 'user'; //nama sesi yang menyimpan username aktif setelah berhasil login
 $config['acl_session_level'] = 'level'; //nama sesi yang menyimpan level aktif setelah berhasil login, hanya untuk mode 2 atau 4 saja
 $config['acl_redirect'] = 'login'; // jika tidak valid maka redirect ke ...
@@ -38,7 +38,7 @@ $config['acl_table_name'] = 'user'; // nama table access control
 $config['acl_user_field_name'] = 'username'; // nama field pada acl yang berisi username untuk di
 $config['acl_level_field_name'] = 'level'; // nama field pada acl yang berisi level
 $config['acl_field_modules_name'] = 'modules'; // nama field pada acl yang berisi module yang boleh diakses. Untuk hak akses seluruh halaman bisa diisi dengan all
-$config['acl_uri_field_name'] = 'uri'; // nama field pada acl yang berisi uri yang tidak boleh diakses.
+$config['acl_uri_field_name'] = 'uri_blacklist'; // nama field pada acl yang berisi uri yang tidak boleh diakses.
 
 // digunakan untuk mode 2 dan seterusnya
 $config['acl_denied_url'] = 'denied';

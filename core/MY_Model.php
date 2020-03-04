@@ -5,6 +5,12 @@ class MY_Model extends CI_Model
 
     protected $table;
     protected $db;
+    /*
+    * setting default untuk result data (printah get)
+    * bisa disi array, object atau none
+    * nilai case defaultnya adalah array
+    */
+    protected $default_result = 'array'; // array, object, none 
 
     public function __construct()
     {
@@ -22,6 +28,11 @@ class MY_Model extends CI_Model
     {
         $this->table = $table;
         return $this;
+    }
+
+    public function table_name()
+    {
+        return $this->table;
     }
 
     public function insert($data)
@@ -53,14 +64,38 @@ class MY_Model extends CI_Model
         if ($where != null) {
             $this->where($where);
         }
-        return $this->db->get($this->table)->result_array();
+        switch ($this->default_result) {
+            case 'array':
+                return $this->db->get($this->table)->result_array();
+                break;
+            case 'object':
+                return $this->db->get($this->table)->result();
+                break;
+            case 'none':
+                return $this->db->get($this->table);
+                break;
+            default:
+                return $this->db->get($this->table)->result_array();
+        }
     }
     public function get_one($where = null)
     {
         if ($where != null) {
             $this->where($where);
         }
-        return $this->db->get($this->table)->row_array();
+        switch ($this->default_result) {
+            case 'array':
+                return $this->db->get($this->table)->row_array();
+                break;
+            case 'object':
+                return $this->db->get($this->table)->row();
+                break;
+            case 'none':
+                return $this->db->get($this->table);
+                break;
+            default:
+                return $this->db->get($this->table)->row_array();
+        }
     }
     public function update($where, $data)
     {
@@ -101,7 +136,19 @@ class MY_Model extends CI_Model
     public function query($sql, $return_data = FALSE)
     {
         if ($return_data === true) {
-            return $this->db->query($sql)->result_array();
+            switch ($this->default_result) {
+                case 'array':
+                    return $this->db->query($sql)->result_array();
+                    break;
+                case 'object':
+                    return $this->db->query($sql)->result();
+                    break;
+                case 'none':
+                    return $this->db->query($sql);
+                    break;
+                default:
+                    return $this->db->query($sql)->result_array();
+            }
         } else {
             return $this->db->query($sql);
         }
@@ -120,6 +167,12 @@ class MY_Model extends CI_Model
     }
 
     public function where($p)
+    {
+        $this->db->where($p);
+        return $this;
+    }
+
+    public function where_in($p)
     {
         $this->db->where($p);
         return $this;
@@ -164,9 +217,14 @@ class MY_Model extends CI_Model
     {
         return $this->db->insert_id();
     }
-    
+
     public function or_where($p)
     {
         return $this->db->or_where($p);
+    }
+
+    public function or_where_in($p1, $p2)
+    {
+        return $this->db->or_where_in($p1, $p2);
     }
 }
