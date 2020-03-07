@@ -5,10 +5,11 @@ class MY_Model extends CI_Model
 
     protected $table;
     protected $db;
+    protected $relation;
     /*
     * setting default untuk result data (printah get)
-    * bisa disi array, object atau none
-    * nilai case defaultnya adalah array
+    * bisa disi array, object atau none (none artinya tidak dikembalikan langsung dalam bentuk data)
+    * jika tidak didefinisikan nilai defaultnya adalah array
     */
     protected $default_result = 'array'; // array, object, none 
 
@@ -43,7 +44,7 @@ class MY_Model extends CI_Model
     public function insert_ignore($data)
     {
         $insert_query = $this->db->insert_string($this->table, $data);
-        $query = str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insert_query);
+        $query = str_replace('INSERT INTO ', 'INSERT IGNORE INTO ', $insert_query);
         return $this->db->query($query);
     }
 
@@ -55,7 +56,7 @@ class MY_Model extends CI_Model
     public function insert_ignore_batch($data)
     {
         $insert_query = $this->db->insert_string($this->table, $data);
-        echo $query = str_replace('INSERT INTO', 'INSERT IGNORE INTO', $insert_query);
+        $query = str_replace('INSERT INTO ', 'INSERT IGNORE INTO ', $insert_query);
         return $this->db->query($query);
     }
 
@@ -135,7 +136,7 @@ class MY_Model extends CI_Model
 
     public function query($sql, $return_data = FALSE)
     {
-        if ($return_data === true) {
+        if ($return_data == true) {
             switch ($this->default_result) {
                 case 'array':
                     return $this->db->query($sql)->result_array();
@@ -157,6 +158,35 @@ class MY_Model extends CI_Model
     public function show_query()
     {
         return $this->db->last_query();
+    }
+
+    /*
+    * function set_relation digunakan untuk menginisialisasi relasi antar table
+    * parameternya: nama relasi, nama tabel yang berelasi, definisi key, jenis join (left,right,dsb)
+    * silakan memanggil function set_relation pada function __construct di tiap model yang akan direlasikan
+    */
+    public function set_relation($relation_name, $p1, $p2, $p3 = null)
+    {
+        return $this->relation[$relation_name] = [$p1, $p2, $p3];
+    }
+
+    /*
+    * function with digunakan bila hasil seleksi akan mengikutsertakan data pada table yang berelasi
+    * sebelumnya harus didefinisikan dulu dengan function set_relation
+    * parameternya: nama relasi 
+    */
+    public function with($relation_name)
+    {
+        $rel = $this->relation[$relation_name];
+        if ($rel != null) {
+            if (isset($rel[2])) {
+                $this->db->join($rel[0], $rel[1], $rel[2]);
+                return $this;
+            } else {
+                $this->db->join($rel[0], $rel[1]);
+                return $this;
+            }
+        }
     }
 
     // fungsi bawaan class database yang sering dipakai
